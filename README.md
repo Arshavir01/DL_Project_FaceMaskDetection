@@ -1,181 +1,97 @@
 # Face Mask Detection using Convolutional Neural Network (CNN)
 
-A Deep Learning project that classifies whether a person is **wearing a face mask** or **not wearing a face mask** using a Convolutional Neural Network (CNN) built with **TensorFlow** and **Keras**.
+A deep learning project that classifies a face photo as **with mask** or **without mask**, using a Convolutional Neural Network built with **TensorFlow** and **Keras**.
 
----
+## Project overview
 
-Project Overview
+The model is trained on about 7,500 face images in two classes (with mask, without mask). The images are resized, normalized and split into training and test sets before training a CNN. The notebook ends with a predictive system that takes the path of a photo and prints the result.
 
-This project demonstrates how to build an image classification model capable of detecting face masks from facial images. The model is trained on two classes:
+## Results
 
--  With Mask
--  Without Mask
+| Metric | Value |
+|--------|-------|
+| Train accuracy (epoch 5) | 92.3% |
+| Validation accuracy (epoch 5) | 90.2% |
+| **Test accuracy** | **89.5%** (1,511 test images) |
+| Test loss | 0.330 |
 
-The dataset is preprocessed, normalized, and split into training and testing sets before being used to train a CNN model.
-
----
-
-## Objectives
-
-- Learn image preprocessing techniques
-- Build a CNN for binary image classification
-- Train and evaluate a deep learning model
-- Predict whether a person is wearing a face mask
-
----
-
-## Technologies Used
-
-- Python
-- TensorFlow
-- Keras
-- NumPy
-- OpenCV
-- Matplotlib
-- PIL (Python Imaging Library)
-- Scikit-learn
-
----
+Training and validation curves are plotted in the notebook. Validation accuracy peaked at 92.7% in epoch 4 and dropped to 90.2% in epoch 5, so training is not fully stable yet (see "Next steps").
 
 ## Dataset
 
-The dataset contains two categories:
+- **Source:** Kaggle dataset [omkargurav/face-mask-dataset](https://www.kaggle.com/datasets/omkargurav/face-mask-dataset)
+- **Size:** 7,553 images: 3,725 with mask and 3,828 without mask
+- After extraction the notebook expects this structure:
 
 ```
-dataset/
-│
+data/
 ├── with_mask/
 └── without_mask/
 ```
 
-Each image is:
-- Resized to **128 × 128 pixels**
-- Converted into a NumPy array
-- Normalized by dividing pixel values by **255**
+## Data preprocessing
 
----
+1. Load the images from both folders.
+2. Resize each image to **128 x 128** and convert it to RGB.
+3. Convert the images to NumPy arrays and create labels (1 = with mask, 0 = without mask).
+4. Split the data: 80% training (6,042 images) and 20% test (1,511 images).
+5. Normalize pixel values by dividing by 255.
 
-## Data Preprocessing
+## CNN architecture
 
-The following preprocessing steps were applied:
-
-- Load images
-- Resize images to 128×128
-- Convert images to NumPy arrays
-- Assign labels
-- Normalize pixel values
-- Split data into training and testing datasets
-
----
-
-## CNN Architecture
-
-The model consists of the following layers:
-
-- Conv2D
-- MaxPooling2D
-- Conv2D
-- MaxPooling2D
-- Flatten
-- Dense (ReLU)
-- Dropout
-- Output Dense layer (Sigmoid)
-
-This architecture extracts image features through convolution layers and performs binary classification using fully connected layers.
-
----
+| Layer | Details |
+|-------|---------|
+| Conv2D | 32 filters, 3x3, ReLU |
+| MaxPooling2D | 2x2 |
+| Conv2D | 64 filters, 3x3, ReLU |
+| MaxPooling2D | 2x2 |
+| Flatten | |
+| Dense + Dropout | 128 units, ReLU, dropout 0.5 |
+| Dense + Dropout | 64 units, ReLU, dropout 0.5 |
+| Output Dense | 2 units, sigmoid |
 
 ## Training
 
-The model is trained using:
-
 - Optimizer: **Adam**
-- Loss Function: **Binary Crossentropy**
-- Evaluation Metric: **Accuracy**
+- Loss: `sparse_categorical_crossentropy`
+- Metric: accuracy
+- 5 epochs, 20% of the training data used for validation
 
----
+## Technologies
 
-## Model Evaluation
+Python, TensorFlow, Keras, NumPy, OpenCV, Matplotlib, Pillow, scikit-learn
 
-After training, the model is evaluated on the test dataset to measure its classification performance.
+## How to run
 
-Typical evaluation metrics include:
-
-- Test Accuracy
-- Test Loss
-
-Training and validation curves can also be visualized to monitor learning performance.
-
----
-
-## Prediction
-
-The trained model can predict whether a new image belongs to one of the following classes:
-
-- With Mask
-- Without Mask
-
----
-
-## Project Structure
+1. Clone the repository:
 
 ```
-Face-Mask-Detection/
-│
-├── dataset/
-│   ├── with_mask/
-│   └── without_mask/
-│
-├── DL_Project_5_Face_Mask_Detection_using_CNN.ipynb
+git clone https://github.com/Arshavir01/DL_Project_FaceMaskDetection.git
+```
+
+2. Open the notebook in **Google Colab** (it uses Colab helpers and `/content/` paths).
+3. Get the dataset: create a Kaggle API token (Kaggle > Settings > Create New Token), upload `kaggle.json` to your Colab session and run the download cell. Never commit `kaggle.json` to GitHub.
+4. If you run locally, install the dependencies with `pip install -r requirements.txt`.
+5. Run all cells.
+
+## Project structure
+
+```
+DL_Project_FaceMaskDetection/
+├── Face Mask Detection using Convolutional Neural Network (CNN).ipynb
 ├── README.md
 └── requirements.txt
 ```
 
----
+The dataset is not stored in this repository. It is downloaded from Kaggle.
 
-## Installation
+## Next steps
 
-Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/Face-Mask-Detection.git
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run the Jupyter Notebook:
-
-```bash
-jupyter notebook
-```
-
----
-
-## Future Improvements
-
-- Use Data Augmentation
-- Apply Transfer Learning (MobileNetV2, ResNet50, EfficientNet)
-- Improve accuracy with a larger dataset
-- Deploy as a web application using Flask or Streamlit
-- Convert the model to TensorFlow Lite for mobile deployment
-
----
-
-## Learning Outcomes
-
-This project demonstrates:
-
-- Image preprocessing
-- Binary image classification
-- Convolutional Neural Networks (CNN)
-- Model training and evaluation
-- Deep Learning workflow using TensorFlow/Keras
-
----
+- Add data augmentation and early stopping to make training more stable.
+- Try transfer learning (MobileNetV2, ResNet50, EfficientNet).
+- The output layer uses 2 sigmoid units with `sparse_categorical_crossentropy`. Switch to `softmax`, or use 1 sigmoid unit with `binary_crossentropy`.
+- Report precision, recall and a confusion matrix for each class.
+- Convert the model to TensorFlow Lite and run it in an Android app, or in real time with a webcam.
 
 ## Author
 
@@ -183,8 +99,6 @@ This project demonstrates:
 
 Senior Android Engineer | Machine Learning Enthusiast
 
----
-
 ## License
 
-This project is created for educational and learning purposes.
+This project is created for educational and learning purposes. The dataset has its own terms on Kaggle.
